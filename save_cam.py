@@ -1,36 +1,65 @@
 import cv2
 import numpy as np
 
-# Playing video from file:
-# cap = cv2.VideoCapture('vtest.avi')
-# Capturing video from webcam:
-clamp_cam = cv2.VideoCapture(0)
-laptop_cam = cv2.VideoCapture(1)
 
-# Capture frame-by-frame
-ret1, frame1 = clamp_cam.read()
-ret2, frame2 = laptop_cam.read()
 
-# Handles the mirroring of the current frame
-frame1 = cv2.flip(frame1,1)
-frame2 = cv2.flip(frame2,1)
+class Camera():
 
-# Our operations on the frame come here
-#gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    def __init__(self, round):
+        #initiate cameras
+        self.clamp_cam = cv2.VideoCapture(0)
+        self.laptop_cam = cv2.VideoCapture(1)
 
-# Saves image of the current frame in jpg file
-#name = 'frame' + str(currentFrame) + '.jpg'
-# cv2.imwrite(name, frame)
+        # initiate recording
+        self.ret1 = None
+        self.frame1 = None
+        self.ret2 = None
+        self.frame2 = None
 
-# Display the resulting frame
-cv2.imshow('frame1',frame1)
-cv2.imshow('frame2', frame2)
-if cv2.waitKey(0) & 0xFF == ord('q'):
-    cv2.destroyAllWindows
+        # variables for saving stuff
+        self.round = round
+        self.current_frame = 0
+        self.name = None
 
-# To stop duplicate image
+    def return_cam_obs(self):
+        # Capture frame-by-frame
+        self.ret1, self.frame1 = self.clamp_cam.read()
+        self.ret2, self.frame2 = self.laptop_cam.read()
 
-# When everything done, release the capture
-clamp_cam.release()
-laptop_cam.release()
-cv2.destroyAllWindows()
+        # Handles the mirroring of the current frame
+        self.frame1 = cv2.flip(self.frame1,1)
+        self.frame2 = cv2.flip(self.frame2,1)
+
+        # Our operations on the frame come here
+        #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return self.frame1, self.frame2
+
+    def show_feed_continuous(self):
+        # Display the resulting frame
+        cv2.imshow('frame1', self.frame1)
+        cv2.imshow('frame2', self.frame2)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.destroyAllWindows
+        # When everything done, release the capture
+        self.clamp_cam.release()
+        self.laptop_cam.release()
+        cv2.destroyAllWindows()
+
+    def show_feed(self):
+        self.current_frame += 1
+        cv2.imshow('frame1', self.frame1)
+        cv2.imshow('frame2', self.frame2)
+        if cv2.waitKey(0) & 0xFF == ord('q'):
+            cv2.destroyAllWindows
+        # When everything done, release the capture
+        self.clamp_cam.release()
+        self.laptop_cam.release()
+        cv2.destroyAllWindows()
+
+    def save_image(self):
+        # Saves image of the current frame in jpg file
+        self.name1 = "round1." + str(self.round) + 'frame_' + str(self.current_frame) + '.jpg'
+        cv2.imwrite(self.name1, self.frame1)
+        self.name2 = "round2." + str(self.round) + 'frame_' + str(self.current_frame) + '.jpg'
+        cv2.imwrite(self.name2, self.frame2)
+

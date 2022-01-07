@@ -9,6 +9,7 @@ from dynamic_model import robot_arm_3dof, Controller
 from sim_utils import length, config_to_polygon_pygame, check_collision, config_to_polygon, arm_to_polygon
 from visualization_util import draw_rectangle_from_config, DISPLAY
 from visualize_robot_arm import Display
+from save_cam import Camera
 
 dt = 0.01  # integration step time
 
@@ -88,6 +89,11 @@ def cap_goal(goal):
 
 
 if __name__ == '__main__':
+
+    #initiate camera
+    camera = Camera(1)
+    camera.show_feed_continuous()
+
     l = ARMS_LENGTHS
 
     robot_base = np.array([0, ZERO_POS_BASE])
@@ -141,6 +147,11 @@ if __name__ == '__main__':
         for pol in vis_polygons:
             pol = [xy + robot_base for xy in pol]
             draw_rectangle_from_config(pol)
+
+        # camera state
+        cam_state = camera.return_cam_obs()
+        #if you want to save camera state, uncomment:
+        #camera.save_image()
 
         # save state
         state.append([t, q[0], q[1], q[2], dq[0], dq[1], dq[2], p[0], p[1]])
