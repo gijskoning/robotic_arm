@@ -26,7 +26,7 @@ def make(domain_name, task_name, seed, from_pixels, height, width, cameras=range
          visualize_reward=False, frame_skip=None, reward_type='dense', change_model=False):
     print("print domain name", domain_name)
     if 'RealArm' not in domain_name:
-        print("Not RealArm")
+        print("Using not RealArm")
 
         change_fetch_model(change_model)
         env = gym.make(domain_name, reward_type=reward_type)
@@ -187,16 +187,18 @@ class EnvWrapper(gym.Env, ABC):
         if mode == 'rgb_array':
             if isinstance(self, GymEnvWrapper):
                 self._env.unwrapped._render_callback()
-            viewer = self._get_viewer(camera_id)
-            # Calling render twice to fix Mujoco change of resolution bug.
-            viewer.render(width, height, camera_id=-1)
-            viewer.render(width, height, camera_id=-1)
-            # window size used for old mujoco-py:
-            data = viewer.read_pixels(width, height, depth=False)
-            # original image is upside-down, so flip it
-            data = data[::-1, :, :]
-            if self.channels_first:
-                data = data.transpose((2, 0, 1))
+            # todo look into fixing the viewer and getting self._env.sim. Might be related to mujoco?
+            data = np.zeros((2,2,1))
+            # viewer = self._get_viewer(camera_id)
+            # # Calling render twice to fix Mujoco change of resolution bug.
+            # viewer.render(width, height, camera_id=-1)
+            # viewer.render(width, height, camera_id=-1)
+            # # window size used for old mujoco-py:
+            # data = viewer.read_pixels(width, height, depth=False)
+            # # original image is upside-down, so flip it
+            # data = data[::-1, :, :]
+            # if self.channels_first:
+            #     data = data.transpose((2, 0, 1))
             return data
 
     def close(self):
@@ -322,7 +324,7 @@ class GymEnvWrapper(EnvWrapper):
 
     def _get_hybrid_state(self):
         grip_pos = self._env.sim.data.get_site_xpos('robot0:grip')
-        dt = self._env.sim.nsubsteps * self._env.sim.model.opt.timestep
+        dt = self._env.sim.nsubsteps * self._env.sim.robot_arm.opt.timestep
         grip_velp = self._env.sim.data.get_site_xvelp('robot0:grip') * dt
         robot_qpos, robot_qvel = gym.envs.robotics.utils.robot_get_obs(self._env.sim)
         gripper_state = robot_qpos[-2:]
