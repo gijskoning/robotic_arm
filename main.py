@@ -154,7 +154,7 @@ if __name__ == '__main__':
         #camera.save_image()
 
         # save state
-        state.append([t, q[0], q[1], q[2], dq[0], dq[1], dq[2], p[0], p[1]])
+        state.append([t, q[0], q[1], q[2], dq[0], dq[1], dq[2], p[0], p[1], cam_state[0], cam_state[2]])
 
         # try to keep it real time with the desired step time
         display.tick()
