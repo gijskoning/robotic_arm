@@ -1,7 +1,7 @@
 
 import cv2
 
-class WaveShareCamera:
+class Camera:
     # https://www.waveshare.com/wiki/OV2710_2MP_USB_Camera_(A)
     # OV2710 2MP USB Camera (A) 1920×1080
 
@@ -9,6 +9,10 @@ class WaveShareCamera:
         #initiate cameras
         self.clamp_cam = cv2.VideoCapture(0)
         self.laptop_cam = cv2.VideoCapture(1)
+
+        self.laptop_cam_res = [1280, 720] # width, height
+        # camera: https://www.sossolutions.nl/waveshare-ov2710-2mp-usb-camera-a-low-light-sensitivity?gclid=CjwKCAiAzrWOBhBjEiwAq85QZ46Il8CN38SxIpZrvZ56z-IghpgvatB7D990TEnIgrXWM6l-1vPRHBoCRusQAvD_BwE
+        self.clamp_cam_res = [1920, 1080]
 
         # initiate recording
         self.ret1 = None
@@ -32,7 +36,7 @@ class WaveShareCamera:
 
         # Our operations on the frame come here
         #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        return self.frame1, self.frame2
+        return [self.frame1, self.frame2]
 
     def show_feed_continuous(self):
         # Display the resulting frame

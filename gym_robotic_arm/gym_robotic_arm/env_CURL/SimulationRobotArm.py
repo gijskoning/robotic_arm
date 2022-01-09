@@ -3,7 +3,10 @@ from gym import spaces
 from gym_robotic_arm.constants import ARMS_LENGTHS
 
 from gym_robotic_arm.dynamic_model import RobotArm3dof
-from gym_robotic_arm.envs.RealRobotArm import RobotArm
+from gym_robotic_arm.env_CURL.RealRobotArm import RobotArm
+
+# resource possibly for making the simulated robot arm
+# https://github.com/roboticsleeds/mujoco-ur5-model
 
 
 class SimulationRobotArm(RobotArm):

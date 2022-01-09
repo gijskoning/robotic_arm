@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 import gym
-from gym_robotic_arm.envs.waveshare_camera import WaveShareCamera
+from gym_robotic_arm.camera import Camera
 from gym import spaces
 
 from gym_robotic_arm.constants import ARMS_LENGTHS, TOTAL_ARM_LENGTH

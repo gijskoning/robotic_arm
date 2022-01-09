@@ -3,17 +3,20 @@ import numpy as np
 import pygame
 from pygame import K_RIGHT, K_LEFT, K_UP, K_DOWN
 
-from gym_robotic_arm.constants import ARMS_LENGTHS, TOTAL_ARM_LENGTH, ZERO_POS_BASE, INITIAL_CONFIG_Q, ARM_WIDTH, \
+from gym_robotic_arm.gym_robotic_arm.constants import ARMS_LENGTHS, TOTAL_ARM_LENGTH, ZERO_POS_BASE, INITIAL_CONFIG_Q, ARM_WIDTH, \
     INITIAL_CONFIG_SERVO, \
     CONTROL_DT
 
-from gym_robotic_arm.dynamic_model import RobotArm3dof, PIDController
+from gym_robotic_arm.gym_robotic_arm.dynamic_model import RobotArm3dof, PIDController
 from serial import SerialException
 
 from sim_utils import length, config_to_polygon_pygame, check_collision, config_to_polygon, arm_to_polygon
 from visualization_util import draw_rectangle_from_config, DISPLAY
 from visualize_robot_arm import Display
-from gym_robotic_arm.arduino_communication import ArduinoControl
+from gym_robotic_arm.gym_robotic_arm.arduino_communication import ArduinoControl
+from gym_robotic_arm.gym_robotic_arm.camera import Camera
+from gym_robotic_arm.gym_robotic_arm.env_GAIL.log_save import DataLog, Save_Expert
+
 
 dt = CONTROL_DT
 # ROBOT     PARAMETERS
@@ -55,10 +58,6 @@ def cap_goal(goal):
 
 if __name__ == '__main__':
 
-    #initiate camera
-    camera = Camera(1)
-    camera.show_feed_continuous()
-
     l = ARMS_LENGTHS
 
     arduino = True
@@ -86,6 +85,12 @@ if __name__ == '__main__':
     display = Display(dt, ARMS_LENGTHS, start_pos=robot_base)
     step = 0
     sent = 2
+
+    # init camera
+    camera = Camera(1)
+    Camera.show_feed_continuous()
+    datalogger = None
+
     while True:
         display.render(q, goal)
 
@@ -106,15 +111,22 @@ if __name__ == '__main__':
             pol = [xy + robot_base for xy in pol]
             draw_rectangle_from_config(pol)
 
-        # camera state
-        cam_state = camera.return_cam_obs()
         #if you want to save camera state, uncomment:
         #camera.save_image()
 
         # save state
-        state.append([t, q[0], q[1], q[2], dq[0], dq[1], dq[2], p[0], p[1], cam_state[0], cam_state[2]])
+        state.append([t, q[0], q[1], q[2], dq[0], dq[1], dq[2], p[0], p[1]])
 
         # try to keep it real time with the desired step time
         display.tick()
         pygame.display.flip()  # update display
         step += 1
+
+        # save log, uncomment to create a GAIL expert dataset 
+        '''observation = Camera.return_cam_obs()
+        action = F_end
+        datalogger = DataLog()
+        datalogger.append_to_log(observation, action)
+        
+        #make button for datalogger.save with tkinter
+        datalogger.save'''
