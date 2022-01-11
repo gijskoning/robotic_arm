@@ -13,6 +13,7 @@ class ArduinoControl:
     def __init__(self, port='COM6'):
         print("trying port", port)
 
+        # initiate arduino communication
         self.arduino = Serial(port=port, baudrate=115200, timeout=.1)
 
     def set_servo(self, q, debug=False):
@@ -25,6 +26,7 @@ class ArduinoControl:
         q = np.clip(q, 0, 100)
         s1, s2, s3 = q.astype(int)
         # self.write_message(f"0:{s1},1:{s2},2:{s3}", debug)
+        #write servo angles, servo identifier:{angle}
         self.write_message(f"0:{s1},1:{s2}", debug)
 
     def write_message(self, x, debug=False):
